@@ -2,7 +2,7 @@
 
 <html>
 	<head>
-		<title> Meiling xinh đẹp </title>
+		<title>Meiling xinh đẹp</title>
 		<meta name="Generator" content="EditPlus" />
 		<meta name="Author" content="An Do" />
 		<meta name="Keywords" content="Iu Meiling <3" />
@@ -14,29 +14,89 @@
 				padding: 0;
 				margin: 0;
 				background: #000;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
+			.box {
+				width: 100%;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				display: flex;
+				flex-direction: column;
 			}
 			canvas {
 				position: absolute;
 				width: 100%;
 				height: 100%;
 			}
+			#pinkboard {
+				position: relative;
+				margin: auto;
+				height: 500px;
+				width: 500px;
+				animation: animate 1.3s infinite;
+			}
+
+			#pinkboard:before,
+			#pinkboard:after {
+				content: "";
+				position: absolute;
+				background: #ea80b0;
+				width: 100px;
+				height: 160px;
+				border-top-left-radius: 50px;
+				border-top-right-radius: 50px;
+			}
+
+			#pinkboard:before {
+				left: 100px;
+				transform: rotate(-45deg);
+				transform-origin: 0 100%;
+				box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+			}
+
+			#pinkboard:after {
+				left: 0;
+				transform: rotate(45deg);
+				transform-origin: 100% 100%;
+			}
+
+			@keyframes animate {
+				0% {
+					transform: scale(1);
+				}
+				30% {
+					transform: scale(0.8);
+				}
+				60% {
+					transform: scale(1.2);
+				}
+				100% {
+					transform: scale(1);
+				}
+			}
 		</style>
 	</head>
 
 	<body>
-		<canvas id="pinkboard"></canvas>
+		<div class="box">
+			<canvas id="pinkboard"></canvas>
+		</div>
+
 		<script>
 			/*
-			 	* Settings
+			 * Settings
 			 */
-
 			var settings = {
 				particles: {
-					length: 500, // maximum amount of particles
+					length: 1500, // maximum amount of particles
 					duration: 2, // particle duration in sec
 					velocity: 100, // particle velocity in pixels/sec
 					effect: -0.75, // play with this for a nice effect
-					size: 30, // particle size in pixels
+					size: 20, // particle size in pixels
 				},
 			};
 
@@ -46,13 +106,8 @@
 			(function () {
 				var b = 0;
 				var c = ["ms", "moz", "webkit", "o"];
-				for (
-					var a = 0;
-					a < c.length && !window.requestAnimationFrame;
-					++a
-				) {
-					window.requestAnimationFrame =
-						window[c[a] + "RequestAnimationFrame"];
+				for (var a = 0; a < c.length && !window.requestAnimationFrame; ++a) {
+					window.requestAnimationFrame = window[c[a] + "RequestAnimationFrame"];
 					window.cancelAnimationFrame =
 						window[c[a] + "CancelAnimationFrame"] ||
 						window[c[a] + "CancelRequestAnimationFrame"];
@@ -76,7 +131,7 @@
 			})();
 
 			/*
-			 	* Point class
+			 * Point class
 			 */
 			var Point = (function () {
 				function Point(x, y) {
@@ -104,9 +159,8 @@
 			})();
 
 			/*
-			 	* Particle class
+			 * Particle class
 			 */
-
 			var Particle = (function () {
 				function Particle() {
 					this.position = new Point();
@@ -137,11 +191,8 @@
 					function ease(t) {
 						return --t * t * t + 1;
 					}
-					var size =
-						image.width *
-						ease(this.age / settings.particles.duration);
-					context.globalAlpha =
-						1 - this.age / settings.particles.duration;
+					var size = image.width * ease(this.age / settings.particles.duration);
+					context.globalAlpha = 1 - this.age / settings.particles.duration;
 					context.drawImage(
 						image,
 						this.position.x - size / 2,
@@ -154,7 +205,7 @@
 			})();
 
 			/*
-			 	* ParticlePool class
+			 * ParticlePool class
 			 */
 			var ParticlePool = (function () {
 				var particles,
@@ -165,8 +216,7 @@
 				function ParticlePool(length) {
 					// create and populate particle pool
 					particles = new Array(length);
-					for (var i = 0; i < particles.length; i++)
-						particles[i] = new Particle();
+					for (var i = 0; i < particles.length; i++) particles[i] = new Particle();
 				}
 
 				ParticlePool.prototype.add = function (x, y, dx, dy) {
@@ -182,20 +232,15 @@
 					var i;
 					// update active particles
 					if (firstActive < firstFree) {
-						for (i = firstActive; i < firstFree; i++)
-							particles[i].update(deltaTime);
+						for (i = firstActive; i < firstFree; i++) particles[i].update(deltaTime);
 					}
 					if (firstFree < firstActive) {
 						for (i = firstActive; i < particles.length; i++)
 							particles[i].update(deltaTime);
-						for (i = 0; i < firstFree; i++)
-							particles[i].update(deltaTime);
+						for (i = 0; i < firstFree; i++) particles[i].update(deltaTime);
 					}
 					// remove inactive particles
-					while (
-						particles[firstActive].age >= duration &&
-						firstActive != firstFree
-					) {
+					while (particles[firstActive].age >= duration && firstActive != firstFree) {
 						firstActive++;
 						if (firstActive == particles.length) firstActive = 0;
 					}
@@ -204,28 +249,25 @@
 				ParticlePool.prototype.draw = function (context, image) {
 					// draw active particles
 					if (firstActive < firstFree) {
-						for (i = firstActive; i < firstFree; i++)
-							particles[i].draw(context, image);
+						for (i = firstActive; i < firstFree; i++) particles[i].draw(context, image);
 					}
 
 					if (firstFree < firstActive) {
 						for (i = firstActive; i < particles.length; i++)
 							particles[i].draw(context, image);
-						for (i = 0; i < firstFree; i++)
-							particles[i].draw(context, image);
+						for (i = 0; i < firstFree; i++) particles[i].draw(context, image);
 					}
 				};
 				return ParticlePool;
 			})();
 
 			/*
-			 	* Putting it all together
+			 * Putting it all together
 			 */
 			(function (canvas) {
 				var context = canvas.getContext("2d"),
 					particles = new ParticlePool(settings.particles.length),
-					particleRate =
-						settings.particles.length / settings.particles.duration, // particles/sec
+					particleRate = settings.particles.length / settings.particles.duration, // particles/sec
 					time;
 
 				// get point on heart with -PI <= t <= PI
@@ -251,11 +293,9 @@
 					function to(t) {
 						var point = pointOnHeart(t);
 						point.x =
-							settings.particles.size / 2 +
-							(point.x * settings.particles.size) / 350;
+							settings.particles.size / 2 + (point.x * settings.particles.size) / 350;
 						point.y =
-							settings.particles.size / 2 -
-							(point.y * settings.particles.size) / 350;
+							settings.particles.size / 2 - (point.y * settings.particles.size) / 350;
 						return point;
 					}
 
@@ -299,13 +339,9 @@
 					var amount = particleRate * deltaTime;
 
 					for (var i = 0; i < amount; i++) {
-						var pos = pointOnHeart(
-							Math.PI - 2 * Math.PI * Math.random()
-						);
+						var pos = pointOnHeart(Math.PI - 2 * Math.PI * Math.random());
 
-						var dir = pos
-							.clone()
-							.length(settings.particles.velocity);
+						var dir = pos.clone().length(settings.particles.velocity);
 
 						particles.add(
 							canvas.width / 2 + pos.x,
@@ -335,5 +371,30 @@
 				}, 10);
 			})(document.getElementById("pinkboard"));
 		</script>
+
+		<div
+			class="center-text"
+			style="
+				background-color: rgb(0, 0, 0);
+				width: 100%;
+				color: #ea80b0;
+				height: 100%;
+				font-size: 25px;
+				/* font-style: italic; */
+				font-family: Comic Sans MS;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				margin-bottom: 5px;
+				text-align: center;
+			"
+		>
+			Meiling ❤️
+		</div>
+		<div class="footer">
+			<audio autoplay loop>
+				<source src="./assest/Tinh-yeu-cua-anh.mp3" type="audio/mpeg"/>
+			</audio>
+		</div>
 	</body>
 </html>
